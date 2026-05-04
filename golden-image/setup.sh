@@ -11,9 +11,12 @@ export DEBIAN_FRONTEND=noninteractive
 # 1. Base system packages
 # ---------------------------------------------------------------------------
 apt-get update
+apt-get install -y software-properties-common
+add-apt-repository -y universe
+apt-get update
 apt-get install -y \
   curl git ca-certificates ufw fail2ban unattended-upgrades \
-  docker.io cloud-init zsh build-essential wget unzip
+  docker.io cloud-init zsh build-essential wget unzip mosh
 
 # ---------------------------------------------------------------------------
 # 2. Create dev user
@@ -45,6 +48,7 @@ ufw default allow outgoing
 ufw allow 22/tcp
 ufw allow 80/tcp
 ufw allow 443/tcp
+ufw allow 60000:61000/udp   # mosh
 ufw --force enable
 
 # ---------------------------------------------------------------------------
@@ -313,7 +317,7 @@ cat > /etc/caddy/Caddyfile << 'CADDYEOF'
 :80 {
     root * /home/dev/web
     file_server {
-        hide .git .env
+        hide .git .env .env.* *.key *.pem *.p12 *.pfx *.crt *.cer
     }
     encode gzip zstd
     header {
@@ -332,8 +336,9 @@ systemctl enable caddy
 # ---------------------------------------------------------------------------
 # 13. Clean builder artifacts that must NOT be baked into customer snapshots
 # ---------------------------------------------------------------------------
-# Remove the builder's SSH key so it doesn't leak into every customer VM
+# Remove builder SSH keys (root and dev) so they don't leak into customer VMs
 rm -f /root/.ssh/authorized_keys
+rm -rf /home/dev/.ssh/
 
 # Remove builder SSH host keys so each customer VM gets unique ones on first boot.
 # cloud-init usually regenerates these, but we enforce it explicitly to avoid
@@ -356,6 +361,7 @@ systemctl enable cloud-init cloud-init-local cloud-config cloud-final
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 find /var/log -type f -exec truncate -s 0 {} \;
+rm -f /home/dev/.zsh_history /home/dev/.bash_history /root/.bash_history
 history -c
 
 echo ""

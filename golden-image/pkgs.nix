@@ -30,7 +30,6 @@
   # Build & Compilation
   # ═══════════════════════════════════════════════════════════════
   pkgs.gcc             # GNU C compiler (treesitter, cgo, native deps)
-  pkgs.gnumake         # GNU Make build tool
   pkgs.watchexec       # Run commands on file changes
 
   # ═══════════════════════════════════════════════════════════════
@@ -53,7 +52,6 @@
   pkgs.fzf             # Fuzzy finder for files, history, processes
   pkgs.zoxide          # Smarter cd command (z / zi)
   pkgs.starship        # Cross-shell prompt (configured in home.nix)
-  pkgs.direnv          # Directory-specific environment variables
 
   # ═══════════════════════════════════════════════════════════════
   # Modern CLI Replacements
