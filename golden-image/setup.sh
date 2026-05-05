@@ -119,29 +119,7 @@ chown dev:caddy /home/dev/web
 chmod 2750 /home/dev/web    # SGID: new files inherit caddy group
 chmod 755 /home/dev         # caddy needs +x to traverse into web/
 
-cat > /home/dev/web/index.html << 'HTMLEOF'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>vibee.sh</title>
-    <style>
-        body { font-family: system-ui, -apple-system, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #0a0a0f; color: #e2e8f0; }
-        .container { text-align: center; }
-        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; color: #FF8C00; }
-        p { font-size: 1.1rem; color: #64748b; }
-        code { background: #1a1a2e; padding: 0.2rem 0.4rem; border-radius: 4px; font-family: 'JetBrains Mono', monospace; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Created with vibee.sh</h1>
-        <p>Drop your files in <code>~/web/</code> to serve them.</p>
-    </div>
-</body>
-</html>
-HTMLEOF
+cp /tmp/index.html /home/dev/web/index.html
 chown dev:caddy /home/dev/web/index.html
 chmod 644 /home/dev/web/index.html
 
@@ -174,7 +152,12 @@ chmod 640 /etc/caddy/Caddyfile
 systemctl enable caddy
 
 # ---------------------------------------------------------------------------
-# 13. Clean builder artifacts that must NOT be baked into customer snapshots
+# 13. Apply all remaining updates before snapshot
+# ---------------------------------------------------------------------------
+apt-get dist-upgrade -y
+
+# ---------------------------------------------------------------------------
+# 14. Clean builder artifacts that must NOT be baked into customer snapshots
 # ---------------------------------------------------------------------------
 # Remove builder SSH keys (root and dev) so they don't leak into customer VMs
 rm -f /root/.ssh/authorized_keys
@@ -186,7 +169,7 @@ rm -rf /home/dev/.ssh/
 rm -f /etc/ssh/ssh_host_*
 
 # ---------------------------------------------------------------------------
-# 14. Prepare cloud-init for re-run on every derived server
+# 15. Prepare cloud-init for re-run on every derived server
 # ---------------------------------------------------------------------------
 # Remove instance-specific data (machine-id, seeds, logs) so cloud-init
 # treats the next boot as a "first boot" and re-applies user-data.
@@ -196,7 +179,7 @@ cloud-init clean --logs --seed --machine-id
 systemctl enable cloud-init cloud-init-local cloud-config cloud-final
 
 # ---------------------------------------------------------------------------
-# 15. Clean up build artifacts and logs
+# 16. Clean up build artifacts and logs
 # ---------------------------------------------------------------------------
 apt-get clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
