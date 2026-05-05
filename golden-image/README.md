@@ -14,9 +14,9 @@ Reusable golden snapshot configuration for Vibee VMs.
 ## Workflow
 
 1. **Create a builder server** — any cloud provider, Ubuntu 24.04, smallest instance type
-2. **Copy and run the setup script**
+2. **Upload and run the setup script**
    ```bash
-   scp golden-image/setup.sh root@<builder-ip>:/tmp/
+   scp public/golden-image/* root@<builder-ip>:/tmp/
    ssh root@<builder-ip> 'bash /tmp/setup.sh'
    ```
 3. **Power off and create a snapshot image** via your provider's CLI or dashboard

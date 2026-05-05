@@ -30,6 +30,7 @@
   # Build & Compilation
   # ═══════════════════════════════════════════════════════════════
   pkgs.gcc             # GNU C compiler (treesitter, cgo, native deps)
+  pkgs.gnumake         # GNU Make build tool
   pkgs.watchexec       # Run commands on file changes
 
   # ═══════════════════════════════════════════════════════════════
